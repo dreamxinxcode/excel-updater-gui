@@ -98,7 +98,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.start_button, 10, 0, 1, 2)
         self.start_button.clicked.connect(self.updater)
 
-        self.console_output = QtWidgets.QListView(self.centralwidget)
+        self.console_output = QtWidgets.QTextEdit(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("xos4 Terminus")
         self.console_output.setFont(font)
@@ -107,7 +107,7 @@ class Ui_MainWindow(object):
         self.console_output.setObjectName("console_output")
         self.gridLayout_2.addWidget(self.console_output, 11, 0, 1, 3)
         self.progressBar = QtWidgets.QProgressBar(self.centralwidget)
-        self.progressBar.setProperty("value", 24)
+        self.progressBar.setProperty("value", 0)
         self.progressBar.setObjectName("progressBar")
         self.gridLayout_2.addWidget(self.progressBar, 12, 0, 1, 3)
         MainWindow.setCentralWidget(self.centralwidget)
@@ -127,12 +127,16 @@ class Ui_MainWindow(object):
         self.actionQuit = QtWidgets.QAction(MainWindow)
         self.actionQuit.setObjectName("actionQuit")
         self.actionDark_Mode = QtWidgets.QAction(MainWindow)
+        self.actionLight_Mode = QtWidgets.QAction(MainWindow)
         self.actionDark_Mode.setObjectName("actionDark_Mode")
+        self.actionLight_Mode.setObjectName("actionLight_Mode")
         self.menuFile.addAction(self.actionQuit)
         self.actionQuit.triggered.connect(self.close_app)
         self.actionDark_Mode.triggered.connect(self.dark_mode)
+        self.actionLight_Mode.triggered.connect(self.light_mode)
 
         self.menuHelp.addAction(self.actionDark_Mode)
+        self.menuHelp.addAction(self.actionLight_Mode)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.menubar.addAction(self.menuHelp_2.menuAction())
@@ -164,13 +168,20 @@ class Ui_MainWindow(object):
         self.menuHelp_2.setTitle(_translate("MainWindow", "Help"))
         self.actionQuit.setText(_translate("MainWindow", "Quit"))
         self.actionDark_Mode.setText(_translate("MainWindow", "Dark Mode"))
+        self.actionLight_Mode.setText(_translate("MainWindow", "Light Mode"))
 
     def updater(self):
+        self.completed = 0
+
+        while self.completed < 100:
+            self.completed += 1
+            self.progressBar.setValue(self.completed)
+
         DIRECTORY = os.path.dirname(os.path.realpath(__file__))
         EXTENTIONS = (".xlsx", ".xlsm", ".xltx", ".xltm")
 
-        TARGET = self.part_number_textbox.text()
-        TARGET_REPLACEMENT = self.new_part_number_textbox.text()
+        TARGET = str(self.part_number_textbox.text())
+        TARGET_REPLACEMENT = str(self.new_part_number_textbox.text())
 
         SUPPLIER = self.supplier_textbox.text()
         SUPPLIER_REPLACEMENT = self.new_supplier_textbox.text()
@@ -189,8 +200,7 @@ class Ui_MainWindow(object):
                 if (file.endswith(EXTENTIONS)):
                     start_time = time.time()
                     path = os.path.join(root, file)
-                    print(
-                        "\033[1m\033[96mOpening:\033[0m \033[1m\033[93m{0}\033[0m".format(file))
+                    self.console_output.append("Opening: {0}".format(file))
                     wb = openpyxl.load_workbook(path, data_only=True)
                     ws = wb.active
                     target_in_wb = False
@@ -203,9 +213,11 @@ class Ui_MainWindow(object):
                             quantity_in_row = False
                             for cell in row:
                                 if (cell.value == TARGET):
-                                    print(
-                                        "\033[1m\033[92mPART STRING FOUND\033[0m")
-                                    print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                    self.console_output.append(
+                                        str("PART STRING FOUND"))
+                                    self.console_output.append(
+                                        str("PART {} STRING FOUND".format(TARGET)))
+                                    print("Replacing {0} with {1} on row {2}".format(
                                         TARGET, TARGET_REPLACEMENT, ws._current_row))
                                     cell.value = TARGET_REPLACEMENT
                                     target_in_wb = True
@@ -214,9 +226,9 @@ class Ui_MainWindow(object):
 
                                         if (QUANTITY != ""):
                                             if (cell.value == QUANTITY):
-                                                print(
-                                                    "\033[1m\033[92mQUANTITY STRING FOUND\033[0m")
-                                                print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                                self.console_output.append(
+                                                    "QUANTITY STRING FOUND")
+                                                print("Replacing {0} with {1} on row {2}".format(
                                                     QUANTITY, QUANTITY_REPLACEMENT, ws._current_row))
                                                 cell.value = QUANTITY_REPLACEMENT
                                                 quantity_in_row = True
@@ -224,8 +236,8 @@ class Ui_MainWindow(object):
                                         if (DESCRIPTION != ""):
                                             if (cell.value == DESCRIPTION):
                                                 print(
-                                                    "\033[1m\033[92mDESCRIPTION STRING FOUND\033[0m")
-                                                print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                                    "DESCRIPTION STRING FOUND")
+                                                print("Replacing {0} with {1} on row {2}".format(
                                                     DESCRIPTION, DESCRIPTION_REPLACEMENT, ws._current_row))
                                                 cell.value = DESCRIPTION_REPLACEMENT
                                                 description_in_row = True
@@ -233,8 +245,8 @@ class Ui_MainWindow(object):
                                         if (TARGET != ""):
                                             if (cell.value == TARGET):
                                                 print(
-                                                    "\033[1m\033[92mTARGET STRING FOUND\033[0m")
-                                                print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                                    "TARGET STRING FOUND")
+                                                print("Replacing {0} with {1} on row {2}".format(
                                                     TARGET, TARGET_REPLACEMENT, ws._current_row))
                                                 cell.value = TARGET_REPLACEMENT
                                                 supplier_in_row = True
@@ -242,8 +254,8 @@ class Ui_MainWindow(object):
                                         if (SUPPLIER != ""):
                                             if (cell.value == SUPPLIER):
                                                 print(
-                                                    "\033[1m\033[92mSUPPLIER STRING FOUND\033[0m")
-                                                print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                                    "SUPPLIER STRING FOUND")
+                                                print("Replacing {0} with {1} on row {2}".format(
                                                     SUPPLIER, SUPPLIER_REPLACEMENT, ws._current_row))
                                                 cell.value = SUPPLIER_REPLACEMENT
                                                 supplier_in_row = True
@@ -251,38 +263,38 @@ class Ui_MainWindow(object):
                                         if (PRICE != ""):
                                             if (cell.value == PRICE):
                                                 print(
-                                                    "\033[1m\033[92mPRICE STRING FOUND\033[0m")
-                                                print("\033[1m\033[96mReplacing\033[0m \033[1m\033[93m{0}\033[0m with \033[1m\033[93m{1}\033[0m on row \033[1m\033[93m{2}\033[0m".format(
+                                                    "PRICE STRING FOUND")
+                                                print("Replacing {0} with {1} on row {2}".format(
                                                     PRICE, PRICE_REPLACEMENT, ws._current_row))
                                                 cell.value = PRICE_REPLACEMENT
                                                 price_in_row = True
 
                                     if (target_in_row == False):
                                         print(
-                                            "\033[1m\033[91mPART NOT FOUND\033[0m")
+                                            "PART NOT FOUND")
                                         pass
                                         if (supplier_in_row == False):
                                             print(
-                                                "\033[1m\033[91mSupplier string not found\033[0m")
+                                                "Supplier string not found")
                                             if (description_in_row == False):
                                                 print(
-                                                    "\033[1m\033[91mDescription string not found\033[0m")
+                                                    "Description string not found")
                                                 if (price_in_row == False):
                                                     print(
-                                                        "\033[1m\033[91mPrice string not found\033[0m")
+                                                        "Price string not found")
                                                     if (quantity_in_row == False):
                                                         print(
-                                                            "\033[1m\033[91mQuantity string not found\033[0m")
+                                                            "Quantity string not found")
 
                     if (target_in_wb == False):
-                        print("\033[1m\033[91mPART NOT FOUND\033[0m")
+                        print("PART NOT FOUND")
 
                     print(
-                        "\033[1m\033[96mSaving:\033[0m \033[1m\033[93m{}\033[0m at \033[1m\033[96m{}\033[0m\n".format(file, datetime.now()))
+                        "Saving: {} at {}\n".format(file, datetime.now()))
                     wb.save(file)
 
         print(
-            "\033[95m[\033[0m\033[96m*\033[0m\033[95m]\033[0m \033[1m\033[96mDone in %s\033[0m" % round((time.time() - start_time), 2))
+            "\033[95m[\033[96m*\033[95m] Done in %s" % round((time.time() - start_time), 2))
 
     def light_mode(self):
         app.setStyleSheet('QMainWindow{background-color: white;}')
@@ -291,8 +303,8 @@ class Ui_MainWindow(object):
         app.setStyleSheet('QMainWindow{background-color: #1E1E1E;}')
 
     def close_app(self):
-        sys.exit()
-        #self.part_number_label.setText(self.part_number_textbox.text())
+        #sys.exit()
+        self.console_output.setText("HELLOOOO")
 
 if __name__ == "__main__":
     import sys
