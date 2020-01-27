@@ -148,21 +148,21 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate(
             "MainWindow", "Silver Streak - Template Updater"))
-        self.part_number_label.setText(_translate("MainWindow", "Part number"))
+        self.part_number_label.setText(_translate("MainWindow", "Part number:"))
         self.new_part_number_label.setText(
-            _translate("MainWindow", "NEW PART NUMBER"))
-        self.supplier_label.setText(_translate("MainWindow", "SUPPLIER"))
+            _translate("MainWindow", "New Part Number:"))
+        self.supplier_label.setText(_translate("MainWindow", "Supplier:"))
         self.new_supplier_label.setText(
-            _translate("MainWindow", "NEW SUPPLIER"))
-        self.price_label.setText(_translate("MainWindow", "PRICE"))
-        self.new_price_label.setText(_translate("MainWindow", "NEW PRICE"))
-        self.description_label.setText(_translate("MainWindow", "DESCRIPTION"))
+            _translate("MainWindow", "New Supplier:"))
+        self.price_label.setText(_translate("MainWindow", "Price:"))
+        self.new_price_label.setText(_translate("MainWindow", "New Price"))
+        self.description_label.setText(_translate("MainWindow", "Description:"))
         self.new_description_label.setText(
-            _translate("MainWindow", "NEW DESCRIPTION"))
-        self.quantity_label.setText(_translate("MainWindow", "QUANTITY"))
+            _translate("MainWindow", "New Description:"))
+        self.quantity_label.setText(_translate("MainWindow", "Quantity:"))
         self.new_quantity_label.setText(
-            _translate("MainWindow", "NEW QUANTITY"))
-        self.start_button.setText(_translate("MainWindow", "START"))
+            _translate("MainWindow", "New Quantity:"))
+        self.start_button.setText(_translate("MainWindow", "Start"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuHelp.setTitle(_translate("MainWindow", "Settings"))
         self.menuHelp_2.setTitle(_translate("MainWindow", "Help"))
@@ -171,6 +171,8 @@ class Ui_MainWindow(object):
         self.actionLight_Mode.setText(_translate("MainWindow", "Light Mode"))
 
     def updater(self):
+        self.console_output.append("starrt")
+        self.console_output.append("jisj")
         self.completed = 0
 
         while self.completed < 100:
@@ -198,9 +200,8 @@ class Ui_MainWindow(object):
         for (root, dirs, files) in os.walk(DIRECTORY):
             for file in files:
                 if (file.endswith(EXTENTIONS)):
-                    start_time = time.time()
                     path = os.path.join(root, file)
-                    self.console_output.append("Opening: {0}".format(file))
+                    self.console_output.append(str("Opening: {0}".format(file)))
                     wb = openpyxl.load_workbook(path, data_only=True)
                     ws = wb.active
                     target_in_wb = False
@@ -217,7 +218,7 @@ class Ui_MainWindow(object):
                                         str("PART STRING FOUND"))
                                     self.console_output.append(
                                         str("PART {} STRING FOUND".format(TARGET)))
-                                    print("Replacing {0} with {1} on row {2}".format(
+                                    self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                         TARGET, TARGET_REPLACEMENT, ws._current_row))
                                     cell.value = TARGET_REPLACEMENT
                                     target_in_wb = True
@@ -228,73 +229,71 @@ class Ui_MainWindow(object):
                                             if (cell.value == QUANTITY):
                                                 self.console_output.append(
                                                     "QUANTITY STRING FOUND")
-                                                print("Replacing {0} with {1} on row {2}".format(
+                                                self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                                     QUANTITY, QUANTITY_REPLACEMENT, ws._current_row))
                                                 cell.value = QUANTITY_REPLACEMENT
                                                 quantity_in_row = True
 
                                         if (DESCRIPTION != ""):
                                             if (cell.value == DESCRIPTION):
-                                                print(
+                                                self.console_output.append(
                                                     "DESCRIPTION STRING FOUND")
-                                                print("Replacing {0} with {1} on row {2}".format(
+                                                self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                                     DESCRIPTION, DESCRIPTION_REPLACEMENT, ws._current_row))
                                                 cell.value = DESCRIPTION_REPLACEMENT
                                                 description_in_row = True
 
                                         if (TARGET != ""):
                                             if (cell.value == TARGET):
-                                                print(
+                                                self.console_output.append(
                                                     "TARGET STRING FOUND")
-                                                print("Replacing {0} with {1} on row {2}".format(
+                                                self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                                     TARGET, TARGET_REPLACEMENT, ws._current_row))
                                                 cell.value = TARGET_REPLACEMENT
                                                 supplier_in_row = True
 
                                         if (SUPPLIER != ""):
                                             if (cell.value == SUPPLIER):
-                                                print(
+                                                self.console_output.append(
                                                     "SUPPLIER STRING FOUND")
-                                                print("Replacing {0} with {1} on row {2}".format(
+                                                self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                                     SUPPLIER, SUPPLIER_REPLACEMENT, ws._current_row))
                                                 cell.value = SUPPLIER_REPLACEMENT
                                                 supplier_in_row = True
 
                                         if (PRICE != ""):
                                             if (cell.value == PRICE):
-                                                print(
+                                                self.console_output.append(
                                                     "PRICE STRING FOUND")
-                                                print("Replacing {0} with {1} on row {2}".format(
+                                                self.console_output.append("Replacing {0} with {1} on row {2}".format(
                                                     PRICE, PRICE_REPLACEMENT, ws._current_row))
                                                 cell.value = PRICE_REPLACEMENT
                                                 price_in_row = True
 
                                     if (target_in_row == False):
-                                        print(
+                                        self.console_output.append(
                                             "PART NOT FOUND")
                                         pass
                                         if (supplier_in_row == False):
-                                            print(
+                                            self.console_output.append(
                                                 "Supplier string not found")
                                             if (description_in_row == False):
-                                                print(
+                                                self.console_output.append(
                                                     "Description string not found")
                                                 if (price_in_row == False):
-                                                    print(
+                                                    self.console_output.append(
                                                         "Price string not found")
                                                     if (quantity_in_row == False):
-                                                        print(
+                                                        self.console_output.append(
                                                             "Quantity string not found")
 
                     if (target_in_wb == False):
-                        print("PART NOT FOUND")
+                        self.console_output.append("PART NOT FOUND")
 
-                    print(
+                    self.console_output.append(
                         "Saving: {} at {}\n".format(file, datetime.now()))
                     wb.save(file)
 
-        print(
-            "\033[95m[\033[96m*\033[95m] Done in %s" % round((time.time() - start_time), 2))
 
     def light_mode(self):
         app.setStyleSheet('QMainWindow{background-color: white;}')
@@ -304,7 +303,7 @@ class Ui_MainWindow(object):
 
     def close_app(self):
         #sys.exit()
-        self.console_output.setText("HELLOOOO")
+        self.console_output.append("HELLOOOO")
 
 if __name__ == "__main__":
     import sys
