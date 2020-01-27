@@ -3,6 +3,4 @@
 
 # But not these files
 !.gitignore
-!updater.py
-!prices.py
-!template.py
+!main.py
