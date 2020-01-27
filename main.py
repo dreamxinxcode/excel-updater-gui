@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 import os
 import time
-
+from datetime import datetime
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -96,6 +96,8 @@ class Ui_MainWindow(object):
         self.start_button = QtWidgets.QPushButton(self.centralwidget)
         self.start_button.setObjectName("start_button")
         self.gridLayout_2.addWidget(self.start_button, 10, 0, 1, 2)
+        self.start_button.clicked.connect(self.updater)
+
         self.console_output = QtWidgets.QListView(self.centralwidget)
         font = QtGui.QFont()
         font.setFamily("xos4 Terminus")
