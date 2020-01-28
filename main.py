@@ -11,7 +11,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 import os
 import time
-from datetime import datetime
+from datetime import date
+import logging
+from socket import gethostname
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -20,8 +22,30 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Russo One")
         MainWindow.setFont(font)
-        MainWindow.setWindowOpacity(1.0)
-        MainWindow.setStyleSheet("")
+        MainWindow.setWindowOpacity(.8)
+
+        MainWindow.setStyleSheet("""
+                            QMainWindow{background-color: #1e1e2f;}
+                            QLineEdit {
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                                background-color: #27293d;
+                                }
+                            QLabel {
+                                color: #a7a7ba;
+                            }
+                            QTextEdit {
+                                background-color: #27293d;
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                            }
+                            QTreeView {
+                                background-color: #27293d;
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                            }
+                            """)
+
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         MainWindow.setDocumentMode(False)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Triangular)
@@ -155,7 +179,7 @@ class Ui_MainWindow(object):
         self.new_supplier_label.setText(
             _translate("MainWindow", "New Supplier:"))
         self.price_label.setText(_translate("MainWindow", "Price:"))
-        self.new_price_label.setText(_translate("MainWindow", "New Price"))
+        self.new_price_label.setText(_translate("MainWindow", "New Price:"))
         self.description_label.setText(_translate("MainWindow", "Description:"))
         self.new_description_label.setText(
             _translate("MainWindow", "New Description:"))
@@ -171,15 +195,15 @@ class Ui_MainWindow(object):
         self.actionLight_Mode.setText(_translate("MainWindow", "Light Mode"))
 
     def updater(self):
-        self.console_output.append("starrt")
-        self.console_output.append("jisj")
+        logging.basicConfig(filename='{}-{}.log'.format(str(gethostname()), str(date.today())),level=logging.DEBUG)
+        logging.info("Starting new session from {}".format(gethostname()))
         self.completed = 0
 
         while self.completed < 100:
             self.completed += 1
             self.progressBar.setValue(self.completed)
 
-        DIRECTORY = os.path.dirname(os.path.realpath(__file__))
+        DIRECTORY = os.path.dirname(os.path.realpath(__file__))  
         EXTENTIONS = (".xlsx", ".xlsm", ".xltx", ".xltm")
 
         TARGET = str(self.part_number_textbox.text())
@@ -202,6 +226,7 @@ class Ui_MainWindow(object):
                 if (file.endswith(EXTENTIONS)):
                     path = os.path.join(root, file)
                     self.console_output.append(str("Opening: {0}".format(file)))
+                    logging.info("Opening: {0}".format(file))
                     wb = openpyxl.load_workbook(path, data_only=True)
                     ws = wb.active
                     target_in_wb = False
@@ -215,10 +240,11 @@ class Ui_MainWindow(object):
                             for cell in row:
                                 if (cell.value == TARGET):
                                     self.console_output.append(
-                                        str("PART STRING FOUND"))
-                                    self.console_output.append(
                                         str("PART {} STRING FOUND".format(TARGET)))
+                                    logging.info("PART {} STRING FOUND".format(TARGET))
                                     self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                        TARGET, TARGET_REPLACEMENT, ws._current_row))
+                                    logging.info("Replacing {0} with {1} on row {2}".format(
                                         TARGET, TARGET_REPLACEMENT, ws._current_row))
                                     cell.value = TARGET_REPLACEMENT
                                     target_in_wb = True
@@ -229,7 +255,10 @@ class Ui_MainWindow(object):
                                             if (cell.value == QUANTITY):
                                                 self.console_output.append(
                                                     "QUANTITY STRING FOUND")
+                                                logging.info("QUANTITY STRING FOUND")
                                                 self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                                    QUANTITY, QUANTITY_REPLACEMENT, ws._current_row))
+                                                logging.info("Replacing {0} with {1} on row {2}".format(
                                                     QUANTITY, QUANTITY_REPLACEMENT, ws._current_row))
                                                 cell.value = QUANTITY_REPLACEMENT
                                                 quantity_in_row = True
@@ -238,16 +267,19 @@ class Ui_MainWindow(object):
                                             if (cell.value == DESCRIPTION):
                                                 self.console_output.append(
                                                     "DESCRIPTION STRING FOUND")
+                                                logging.info("DESCRIPTION STRING FOUND")
                                                 self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                                    DESCRIPTION, DESCRIPTION_REPLACEMENT, ws._current_row))
+                                                logging.info("Replacing {0} with {1} on row {2}".format(
                                                     DESCRIPTION, DESCRIPTION_REPLACEMENT, ws._current_row))
                                                 cell.value = DESCRIPTION_REPLACEMENT
                                                 description_in_row = True
 
                                         if (TARGET != ""):
                                             if (cell.value == TARGET):
-                                                self.console_output.append(
-                                                    "TARGET STRING FOUND")
                                                 self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                                    TARGET, TARGET_REPLACEMENT, ws._current_row))
+                                                logging.info("Replacing {0} with {1} on row {2}".format(
                                                     TARGET, TARGET_REPLACEMENT, ws._current_row))
                                                 cell.value = TARGET_REPLACEMENT
                                                 supplier_in_row = True
@@ -256,7 +288,10 @@ class Ui_MainWindow(object):
                                             if (cell.value == SUPPLIER):
                                                 self.console_output.append(
                                                     "SUPPLIER STRING FOUND")
+                                                logging.info("SUPPLIER STRING FOUND")
                                                 self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                                    SUPPLIER, SUPPLIER_REPLACEMENT, ws._current_row))
+                                                logging.info("Replacing {0} with {1} on row {2}".format(
                                                     SUPPLIER, SUPPLIER_REPLACEMENT, ws._current_row))
                                                 cell.value = SUPPLIER_REPLACEMENT
                                                 supplier_in_row = True
@@ -265,7 +300,10 @@ class Ui_MainWindow(object):
                                             if (cell.value == PRICE):
                                                 self.console_output.append(
                                                     "PRICE STRING FOUND")
+                                                logging.info("PRICE STRING FOUND")
                                                 self.console_output.append("Replacing {0} with {1} on row {2}".format(
+                                                    PRICE, PRICE_REPLACEMENT, ws._current_row))
+                                                logging.info("Replacing {0} with {1} on row {2}".format(
                                                     PRICE, PRICE_REPLACEMENT, ws._current_row))
                                                 cell.value = PRICE_REPLACEMENT
                                                 price_in_row = True
@@ -273,37 +311,67 @@ class Ui_MainWindow(object):
                                     if (target_in_row == False):
                                         self.console_output.append(
                                             "PART NOT FOUND")
+                                        logging.info("PART NOT FOUND")
                                         pass
                                         if (supplier_in_row == False):
                                             self.console_output.append(
                                                 "Supplier string not found")
+                                            logging.info(
+                                                "Supplier string not found")
                                             if (description_in_row == False):
                                                 self.console_output.append(
                                                     "Description string not found")
+                                                logging.info("Description string not found")
                                                 if (price_in_row == False):
                                                     self.console_output.append(
                                                         "Price string not found")
+                                                    logging.info("Price string not found")
                                                     if (quantity_in_row == False):
                                                         self.console_output.append(
                                                             "Quantity string not found")
+                                                        logging.info("Quantity string not found")
 
                     if (target_in_wb == False):
                         self.console_output.append("PART NOT FOUND")
+                        logging.info("PART NOT FOUND")
 
                     self.console_output.append(
-                        "Saving: {} at {}\n".format(file, datetime.now()))
+                        "Saving: {} at {}\n".format(file, date.today()))
+                    logging.info(
+                        "Saving: {} at {}\n".format(file, date.today()))
                     wb.save(file)
 
 
     def light_mode(self):
         app.setStyleSheet('QMainWindow{background-color: white;}')
 
+
     def dark_mode(self):
-        app.setStyleSheet('QMainWindow{background-color: #1E1E1E;}')
+        app.setStyleSheet("""
+                            QMainWindow{background-color: #1e1e2f;}
+                            QLineEdit {
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                                background-color: #27293d;
+                                }
+                            QLabel {
+                                color: #a7a7ba;
+                            }
+                            QTextEdit {
+                                background-color: #27293d;
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                            }
+                            QTreeView {
+                                background-color: #27293d;
+                                color: #a7a7ba;
+                                border: 1px solid #353a53;
+                            }
+                            """)
 
     def close_app(self):
-        #sys.exit()
-        self.console_output.append("HELLOOOO")
+        sys.exit()
+
 
 if __name__ == "__main__":
     import sys
