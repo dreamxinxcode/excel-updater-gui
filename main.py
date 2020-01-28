@@ -22,7 +22,7 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setFamily("Russo One")
         MainWindow.setFont(font)
-        MainWindow.setWindowOpacity(.8)
+        MainWindow.setWindowOpacity(1.0)
 
         MainWindow.setStyleSheet("""
                             QMainWindow{background-color: #1e1e2f;}
