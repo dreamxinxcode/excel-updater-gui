@@ -14,6 +14,8 @@ import time
 from datetime import date
 import logging
 from socket import gethostname
+import qtawesome
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -25,11 +27,16 @@ class Ui_MainWindow(object):
         MainWindow.setWindowOpacity(1.0)
 
         MainWindow.setStyleSheet("""
+                            * {
+                                font-family: "Russo one";
+                            }
                             QMainWindow{background-color: #1e1e2f;}
                             QLineEdit {
                                 color: #a7a7ba;
                                 border: 1px solid #353a53;
                                 background-color: #27293d;
+                                padding: 3px;
+                                margin-bottom: 3px;
                                 }
                             QLabel {
                                 color: #a7a7ba;
@@ -38,11 +45,24 @@ class Ui_MainWindow(object):
                                 background-color: #27293d;
                                 color: #a7a7ba;
                                 border: 1px solid #353a53;
+                                padding: 3px;
                             }
                             QTreeView {
                                 background-color: #27293d;
                                 color: #a7a7ba;
                                 border: 1px solid #353a53;
+                            }
+                            QProgressBar {
+                                background-color: #27293d;
+                                color: #a7a7ba;
+                            }
+                            QPushButton {
+                                background-color: #3bb001;
+                                border: 1px solid #353a53;
+                                padding: 5px;
+                                font-size: 15px;
+                                font-weight: 900;
+                                color: #FFFFFF;
                             }
                             """)
 
@@ -186,11 +206,12 @@ class Ui_MainWindow(object):
         self.quantity_label.setText(_translate("MainWindow", "Quantity:"))
         self.new_quantity_label.setText(
             _translate("MainWindow", "New Quantity:"))
+        fa5_icon = qtawesome.icon('fa5.flag')
         self.start_button.setText(_translate("MainWindow", "Start"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuHelp.setTitle(_translate("MainWindow", "Settings"))
         self.menuHelp_2.setTitle(_translate("MainWindow", "Help"))
-        self.actionQuit.setText(_translate("MainWindow", "Quit"))
+        self.actionQuit.setText(_translate("MainWindow",fa5_icon, "Quit"))
         self.actionDark_Mode.setText(_translate("MainWindow", "Dark Mode"))
         self.actionLight_Mode.setText(_translate("MainWindow", "Light Mode"))
 
