@@ -11,11 +11,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import openpyxl
 import os
 import time
-from datetime import date
+from datetime import datetime
 import logging
 from socket import gethostname
 import qtawesome
-
+from shutil import copyfile
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -168,6 +168,8 @@ class Ui_MainWindow(object):
         self.menuHelp_2 = QtWidgets.QMenu(self.menubar)
         self.menuHelp_2.setObjectName("menuHelp_2")
         MainWindow.setMenuBar(self.menubar)
+        self.actionBackup = QtWidgets.QAction(MainWindow)
+        self.actionBackup.setObjectName("actionBackup")
         self.actionQuit = QtWidgets.QAction(MainWindow)
         self.actionQuit.setObjectName("actionQuit")
         self.actionDark_Mode = QtWidgets.QAction(MainWindow)
@@ -176,9 +178,10 @@ class Ui_MainWindow(object):
         self.actionLight_Mode.setObjectName("actionLight_Mode")
         self.menuFile.addAction(self.actionQuit)
         self.actionQuit.triggered.connect(self.close_app)
+        self.actionBackup.triggered.connect(self.create_backup)
         self.actionDark_Mode.triggered.connect(self.dark_mode)
         self.actionLight_Mode.triggered.connect(self.light_mode)
-
+        self.menuFile.addAction(self.actionBackup)
         self.menuHelp.addAction(self.actionDark_Mode)
         self.menuHelp.addAction(self.actionLight_Mode)
         self.menubar.addAction(self.menuFile.menuAction())
@@ -206,17 +209,17 @@ class Ui_MainWindow(object):
         self.quantity_label.setText(_translate("MainWindow", "Quantity:"))
         self.new_quantity_label.setText(
             _translate("MainWindow", "New Quantity:"))
-        fa5_icon = qtawesome.icon('fa5.flag')
         self.start_button.setText(_translate("MainWindow", "Start"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
         self.menuHelp.setTitle(_translate("MainWindow", "Settings"))
         self.menuHelp_2.setTitle(_translate("MainWindow", "Help"))
-        self.actionQuit.setText(_translate("MainWindow",fa5_icon, "Quit"))
+        self.actionQuit.setText(_translate("MainWindow", "Quit"))
+        self.actionBackup.setText(_translate("MainWindow", "Backup"))
         self.actionDark_Mode.setText(_translate("MainWindow", "Dark Mode"))
         self.actionLight_Mode.setText(_translate("MainWindow", "Light Mode"))
 
     def updater(self):
-        logging.basicConfig(filename='{}-{}.log'.format(str(gethostname()), str(date.today())),level=logging.DEBUG)
+        logging.basicConfig(filename='{}-{}.log'.format(str(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())), str(gethostname())), level=logging.DEBUG)
         logging.info("Starting new session from {}".format(gethostname()))
         self.completed = 0
 
@@ -242,7 +245,7 @@ class Ui_MainWindow(object):
         QUANTITY = self.quantity_textbox.text()
         QUANTITY_REPLACEMENT = self.new_quantity_textbox.text()
 
-        for (root, dirs, files) in os.walk(DIRECTORY):
+        for (root, files) in os.walk(DIRECTORY):
             for file in files:
                 if (file.endswith(EXTENTIONS)):
                     path = os.path.join(root, file)
@@ -357,11 +360,29 @@ class Ui_MainWindow(object):
                         logging.info("PART NOT FOUND")
 
                     self.console_output.append(
-                        "Saving: {} at {}\n".format(file, date.today()))
+                        "Saving: {} at {}\n".format(file, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                     logging.info(
-                        "Saving: {} at {}\n".format(file, date.today()))
+                        "Saving: {} at {}\n".format(file, datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
                     wb.save(file)
 
+
+    def create_backup(self):
+        DIRECTORY = os.path.dirname(os.path.realpath(__file__))  
+        EXTENTIONS = (".xlsx", ".xlsm", ".xltx", ".xltm")
+        self.console_output.append(str("Starting backup"))
+        logging.info("Starting backup")
+
+        if not os.path.exists('backup'):
+            os.makedirs('backup')
+
+        files = os.walk(DIRECTORY)
+        for file in files:
+            if (file.endswith(EXTENTIONS)):
+                self.console_output.append(str("Copying: {0}".format(file)))
+                logging.info("Copying: {0}".format(file))
+                copyfile(file, "backup")
+
+        
 
     def light_mode(self):
         app.setStyleSheet('QMainWindow{background-color: white;}')
