@@ -8,6 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 import openpyxl
 import os
 import time
@@ -30,7 +31,22 @@ class Ui_MainWindow(object):
                             * {
                                 font-family: "Russo one";
                             }
-                            QMainWindow{background-color: #1e1e2f;}
+                            QMenuBar{
+                                background-color: #27293d;
+                                border: 1px solid #353a53;
+                                color: #a7a7ba;
+                            }
+                            QMenu{
+                                background-color: #27293d;
+                                border: 1px solid #353a53;
+                            }
+
+                            QAction{
+                                color: white;
+                            }
+                            QMainWindow{
+                                background-color: #1e1e2f;    
+                            }
                             QLineEdit {
                                 color: #a7a7ba;
                                 border: 1px solid #353a53;
@@ -390,7 +406,9 @@ class Ui_MainWindow(object):
 
     def dark_mode(self):
         app.setStyleSheet("""
-                            QMainWindow{background-color: #1e1e2f;}
+                            QMainWindow{
+                                background-color: #1e1e2f;
+                            }
                             QLineEdit {
                                 color: #a7a7ba;
                                 border: 1px solid #353a53;
@@ -412,7 +430,8 @@ class Ui_MainWindow(object):
                             """)
 
     def close_app(self):
-        sys.exit()
+        QMessageBox.about(self, "Title", "Message")
+
 
 
 if __name__ == "__main__":
